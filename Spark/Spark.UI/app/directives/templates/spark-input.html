@@ -1,0 +1,19 @@
+﻿<md-input-container flex="100">
+    <label for="{{spId}}">{{spLabel}}</label>
+    <input id="{{spId}}" name="{{spName}}" ng-model="spModel" ng-disabled="{{spDisabled}}" ng-required="{{spRequired}}" ng-pattern="spRegex" md-maxlength="spMax" md-minlength="spMin" />
+    
+    <div ng-messages="{{isValid}}" role="alert">
+        <div ng-hide="isValidRequired" ng-message="required">
+            {{spLabel}} is required.
+        </div>
+        <div  ng-hide="isValidPattern"ng-message="pattern">
+            Please enter a valid input.
+        </div>
+        <div ng-hide="isValidMin" ng-message="min">
+            Please enter a valid input.
+        </div>
+        <div ng-hide="isValidMax" ng-message="max">
+            {{spLabel}} should not be more than {{spMax}} characters.
+        </div>
+    </div>
+</md-input-container>

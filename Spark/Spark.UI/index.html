@@ -1,0 +1,90 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Spark UI Ver-1.1.1.</title>
+	<meta charset="utf-8" />
+    <link href="css/angular-material.min.css" rel="stylesheet" />
+</head>
+<body ng-app="main" ng-controller="testCtrl">
+    <form name="form.formName">
+        <spark-input sp-model="user.name" sp-id="txtName" sp-label="user.label" sp-required="true" sp-disabled="false" 
+            sp-type="numeric"       sp-max="20"  ></spark-input>
+        
+    </form>
+    <!--Angular main files-->
+    <script src="app/angular/angular.min.js"></script>
+    <script src="app/angular/angular-route.min.js"></script>
+    <script src="app/angular/angular-messages.min.js"></script>
+    <script src="app/angular/angular-aria.min.js"></script>
+    <script src="app/angular/angular-animate.min.js"></script>
+    <!--Material main files-->
+    <script src="app/angular/angular-material.min.js"></script>
+    <script>
+        var mainApp = angular.module('main', ['spark']);
+        mainApp.controller('testCtrl', function ($scope,$log) {
+            var user = {};
+            user.name = 'Abir';
+            user.label = 'Name';
+            //user.formName = 'test';
+            $scope.user = user;
+            $scope.form = {};
+            $log.debug($scope.form);
+        });
+        var spark = angular.module('spark', ['ngMaterial']);
+        spark.directive('sparkInput', function ($log, $parse, $rootScope) {
+            return {
+                restrict: 'E',
+                templateUrl: 'app/directives/templates/spark-input.html',
+                scope: {
+                    spModel: '='
+                    , spId: '@'
+                    , spLabel: '='
+                    , spType: '@'
+                    , spAllowSpecialChar: '@'
+                    , spDisabled: '='
+                    , spRequired: '='
+                    , spMin: '='
+                    , spMax: '='
+                },
+                link: function (scope, element, attr) {
+                    //Declaring valid types and corresponding regular expressions.
+                    //Abir.D: need to move this to config
+                    scope.validTypes = ['alpha', 'alphaNumeric', 'numeric', 'decimal', 'email'];
+                    scope.regx = [/^[a-zA-Z]*$/, /^[a-zA-Z0-9]*$/, /^[0-9]*$/,/^[0-9.]*$/, /^.+@.+\..+$/];
+
+                    //specifying the name of the input
+                    scope.spName = scope.spId;
+
+                    //specidying the type. Default will be alpha which does not allow any special characters
+                    if (angular.isDefined(scope.spType)) {
+                        var index = scope.validTypes.indexOf(scope.spType);
+                        if(index !== -1){
+                            scope.spRegex = scope.regx[index];
+                        }
+                        else {
+                            $log.error(scope.spType + 'is not a valid type.');
+                        }
+                    }
+                    else {
+                        scope.spType = scope.validTypes[1];
+                        scope.spRegex = scope.regx[1];
+                    }
+                    //Validation
+                    //Known Issue: Validation message animation not working properly.
+                    element.on('focusout keyup', function (event) {
+                        scope.isValidRequired = !element.find('input').hasClass('ng-invalid-required');
+                        scope.isValidPattern = !element.find('input').hasClass('ng-invalid-pattern');
+                        scope.isValidMin = !element.find('input').hasClass('ng-invalid-md-minlength');
+                        scope.isValidMax = !element.find('input').hasClass('ng-invalid-md-maxlength');
+                    });
+
+                    //Masking
+                    element.on('keyup', function (event) {
+                        $log.debug(event);
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>
